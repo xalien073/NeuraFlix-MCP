@@ -25,7 +25,7 @@ async def run_memory_chat():
         memory_enabled=True,
     )
 
-    print("\n🎬 ===== Talk to your Neuraflix Agent =====")
+    print("\n===== Talk to your Neuraflix Agent =====")
     print("Type 'exit' or 'quit' to end the chat")
     print("Type 'clear' to reset memory")
     print("==========================================\n")
@@ -43,7 +43,7 @@ async def run_memory_chat():
                 print("Conversation history cleared.")
                 continue
 
-            print("\nAssistant: ", end="", flush=True)
+            print("\nNF-MCP-Agent: ", end="\n", flush=True)
             try:
                 response = await agent.run(user_input)
                 print(response)

@@ -1,7 +1,11 @@
 import aiohttp
 import asyncio
+from dotenv import load_dotenv
+import os
 
-OMDB_API_KEY = "610e6a03"
+load_dotenv()
+
+OMDB_API_KEY = os.getenv("OMDB_API_KEY")
 
 async def fetch_movie_data(title):
     api_url = f"http://www.omdbapi.com/?t={title}&apikey={OMDB_API_KEY}"
@@ -30,7 +34,7 @@ async def fetch_movie_data(title):
 
 # To test:
 if __name__ == "__main__":
-        movie_title = "Ice Age"
+    movie_title = str(input("Enter movie name"))
     result = asyncio.run(fetch_movie_data(movie_title))
     print("Parsed movie data:", result)
 
