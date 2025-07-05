@@ -116,6 +116,63 @@ async def gremlin_insert(movie_id, title, year, genre, thumb, directors, actors)
 
     await run_blocking(_work)
 
+
+from langchain_groq import ChatGroq
+from langchain_core.prompts import ChatPromptTemplate
+
+@mcp.tool()
+async def insert_movies_from_prompt(user_prompt: str) -> str:
+    """
+    Accepts a user prompt (e.g., 'Insert Harry Potter movie series'),
+    uses the LLM to extract or generate a list of real movie titles,
+    and inserts them into the NeuraFlix knowledge graph.
+    """
+    # Ensure GROQ_API_KEY is loaded
+    if not os.getenv("GROQ_API_KEY"):
+        load_dotenv()
+        os.environ["GROQ_API_KEY"] = os.getenv("GROQ_API_KEY")
+
+    try:
+        # Prompt to extract movie titles
+        prompt = ChatPromptTemplate.from_messages([
+            ("system", "You're an assistant that extracts real, valid movie titles from a user prompt. "
+                       "Return a numbered list of actual movie titles only, without extra commentary."),
+            ("user", "{prompt}")
+        ])
+        messages = prompt.format_messages(prompt=user_prompt)
+
+        llm = ChatGroq(model="qwen-qwq-32b")
+        response = await llm.ainvoke(messages)
+        content = response.content.strip()
+
+        # Parse the LLM's response into movie title list
+        lines = content.splitlines()
+        titles = []
+        for line in lines:
+            # Extract titles from numbered list like "1. Harry Potter and the Sorcerer's Stone"
+            if "." in line:
+                title = line.split(".", 1)[1].strip().strip('"')
+                if title:
+                    titles.append(title)
+            else:
+                # fallback for unnumbered plain lines
+                cleaned = line.strip().strip('"')
+                if cleaned:
+                    titles.append(cleaned)
+
+        if not titles:
+            return "No valid movie titles were extracted from the prompt."
+
+        result_msgs = []
+        for title in titles:
+            result = await insert_movie_with_details(title)
+            result_msgs.append(f"✔️ {title}: {result}")
+
+        return "\n".join(result_msgs)
+
+    except Exception as e:
+        return f"[Error] Could not process movies from prompt: {e}"
+
 @mcp.tool()
 async def insert_movie_with_details(title: str) -> str:
     """
