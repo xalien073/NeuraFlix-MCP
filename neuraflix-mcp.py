@@ -141,7 +141,7 @@ async def insert_movies_from_prompt(user_prompt: str) -> str:
         ])
         messages = prompt.format_messages(prompt=user_prompt)
 
-        llm = ChatGroq(model="qwen-qwq-32b")
+        llm = ChatGroq(model="qwen/qwen3-32b")
         response = await llm.ainvoke(messages)
         content = response.content.strip()
 

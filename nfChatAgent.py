@@ -22,7 +22,7 @@ if "messages" not in st.session_state:
 if "agent" not in st.session_state:
     config_file = "neuraflix-mcp.json"
     client = MCPClient.from_config_file(config_file)
-    llm = ChatGroq(model="qwen-qwq-32b")
+    llm = ChatGroq(model="qwen/qwen3-32b")
 
     agent = MCPAgent(
         llm=llm,

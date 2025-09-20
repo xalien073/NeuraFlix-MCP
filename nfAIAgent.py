@@ -17,7 +17,7 @@ async def run_memory_chat():
 
     # Create MCP client and agent
     client = MCPClient.from_config_file(config_file)
-    llm = ChatGroq(model="qwen-qwq-32b")
+    llm = ChatGroq(model="qwen/qwen3-32b")
 
     agent = MCPAgent(
         llm=llm,
