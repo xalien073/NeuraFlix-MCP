@@ -7,7 +7,13 @@ from gremlin_python.driver.client import Client
 from gremlin_python.driver.serializer import GraphSONSerializersV2d0
 
 load_dotenv()
-mcp = FastMCP("neuraflix-mcp")
+
+# mcp = FastMCP("neuraflix-mcp")
+mcp = FastMCP(
+    name="NeuraFlixMCP",
+    host="0.0.0.0",  # only used for SSE transport (localhost)
+    port=8000,  # only used for SSE transport (set this to any port)
+)
 
 OMDB_API_KEY = os.getenv("OMDB_API_KEY")
 OMDB_BASE_URL = "http://www.omdbapi.com"
@@ -221,3 +227,14 @@ async def insert_movie_with_details(title: str) -> str:
 def test(msg: str) -> str:
     return f"ok: {msg}"
 
+# To run the MCP server remotely
+if __name__ == "__main__":
+    transport = "sse"
+    if transport == "stdio":
+        print("Running server with stdio transport")
+        mcp.run(transport="stdio")
+    elif transport == "sse":
+        print("Running server with SSE transport")
+        mcp.run(transport="sse")
+    else:
+        raise ValueError(f"Unknown transport: {transport}")
